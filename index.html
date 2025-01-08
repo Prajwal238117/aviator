@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviator Game</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="top-bar">
+        <div id="profile">
+          <img src="profile.png" alt="Profile" id="profile-img">
+          <span id="profile-name">Username</span>
+        </div>
+        <div id="balance-container">
+          <p>Balance: $<span id="balance">1000</span></p>
+        </div>
+      </div>
+      
+      <div id="game-container">
+        <img id="aviator-image" src="aviator.png" alt="Aviator Plane" />
+        <h2>Place your Bet</h2>
+        <input type="number" id="bet-amount" placeholder="Enter bet amount" min="1" step="1" />
+        <button id="place-bet-button">Place Bet</button>
+      
+        <h2>Game Info</h2>
+        <p>Multiplier: <span id="multiplier">1.00x</span></p>
+        <p>Balance: $<span id="balance">1000</span></p>
+        <p>Winnings: $<span id="winnings">0.00</span></p>
+      
+        <button id="cashout-button" disabled>Cash Out</button>
+        <div id="cashout-notification" class="hide"></div>
+        
+      </div>
+
+      <!-- Bet History Section -->
+<div id="bet-history">
+  <h3>Bet History</h3>
+  <ul id="bet-history-list">
+    <!-- Bet history will be dynamically added here -->
+  </ul>
+</div>
+
+      
+      
+      
+        
+      
+      
+      
+      
+      
+  <script src="script.js"></script>
+</body>
+</html>
