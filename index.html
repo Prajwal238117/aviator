@@ -1,55 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aviator Game</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Top-Up - Your Gaming Digital Store</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
-    <div id="top-bar">
-        <div id="profile">
-          <img src="profile.png" alt="Profile" id="profile-img">
-          <span id="profile-name">Username</span>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-gamepad"></i> Nepal Top-Up
         </div>
-        <div id="balance-container">
-          <p>Balance: $<span id="balance">1000</span></p>
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#products">Games</a>
+            <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+            <a href="profile.html" class="account-icon"><i class="fas fa-user"></i></a>
         </div>
-      </div>
-      
-      <div id="game-container">
-        <img id="aviator-image" src="aviator.png" alt="Aviator Plane" />
-        <h2>Place your Bet</h2>
-        <input type="number" id="bet-amount" placeholder="Enter bet amount" min="1" step="1" />
-        <button id="place-bet-button">Place Bet</button>
-      
-        <h2>Game Info</h2>
-        <p>Multiplier: <span id="multiplier">1.00x</span></p>
-        <p>Balance: $<span id="balance">1000</span></p>
-        <p>Winnings: $<span id="winnings">0.00</span></p>
-      
-        <button id="cashout-button" disabled>Cash Out</button>
-        <div id="cashout-notification" class="hide"></div>
-        
-      </div>
+        <div class="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
 
-      <!-- Bet History Section -->
-<div id="bet-history">
-  <h3>Bet History</h3>
-  <ul id="bet-history-list">
-    <!-- Bet history will be dynamically added here -->
-  </ul>
-</div>
+    <div class="mobile-menu">
+        <a href="#" class="active">Home</a>
+        <a href="#products">Games</a>
+        <a href="#categories">Categories</a>
+        <a href="cart.html">Cart</a>
+        <a href="profile.html">Account</a>
+    </div>
 
-      
-      
-      
-        
-      
-      
-      
-      
-      
-  <script src="script.js"></script>
+    <header class="hero">
+        <div class="hero-content animate__animated animate__fadeIn">
+            <h1>Welcome to Nepal Top-Up</h1>
+            <p>Your Ultimate Gaming Digital Store</p>
+            <div class="hero-buttons">
+                <a href="#products" class="btn-primary">Shop Now</a>
+                <a href="#categories" class="btn-secondary">Browse Categories</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="categories-section">
+            <h2 class="section-title">Shop by Category</h2>
+            <div class="categories-container">
+                <a href="category.html?category=mobile-games" class="category-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Mobile Games</h3>
+                </a>
+                <a href="category.html?category=pc-games" class="category-card">
+                    <i class="fas fa-desktop"></i>
+                    <h3>PC Games</h3>
+                </a>
+                <a href="category.html?category=console-games" class="category-card">
+                    <i class="fas fa-tv"></i>
+                    <h3>Console Games</h3>
+                </a>
+                <a href="category.html?category=gift-cards" class="category-card">
+                    <i class="fas fa-gift"></i>
+                    <h3>Gift Cards</h3>
+                </a>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <h2 class="section-title">Why Choose Nepal Top-Up?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Secure Payments</h3>
+                    <p>Your transactions are protected with industry-leading security measures</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Instant Delivery</h3>
+                    <p>Get your digital codes and top-ups delivered instantly after purchase</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-headset"></i>
+                    <h3>24/7 Support</h3>
+                    <p>Our dedicated support team is always here to help you</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-tag"></i>
+                    <h3>Best Prices</h3>
+                    <p>Competitive prices with regular deals and discounts</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="rate-us-section">
+            <div class="rate-us-content">
+                <h2 class="section-title">Rate Your Experience</h2>
+                <p>Help us improve our services by sharing your feedback</p>
+                <div class="rating-stars">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                </div>
+                <form id="review-form" class="review-form">
+                    <textarea placeholder="Share your experience with us..." required></textarea>
+                    <button type="submit" class="btn-primary">Submit Review</button>
+                </form>
+                <a href="reviews.html" class="btn-secondary">See All Reviews</a>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="stats-container">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <h3 id="happy-customers">0</h3>
+                    <p>Happy Customers</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3 id="completed-orders">0</h3>
+                    <p>Orders Completed</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-globe"></i>
+                    <h3 id="games-supported">0</h3>
+                    <p>Games Supported</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-star"></i>
+                    <h3 id="average-rating">0.0/5</h3>
+                    <p>Average Rating</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="newsletter-section">
+            <div class="newsletter-content">
+                <h2>Stay Updated</h2>
+                <p>Subscribe to our newsletter for exclusive deals and updates</p>
+                <form id="newsletter-form" class="newsletter-form">
+                    <div class="form-group">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit" class="btn-primary">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>Nepal Top-Up is your one-stop shop for all digital gaming needs, including game top-ups and gift cards.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#products">Games</a></li>
+                    <li><a href="#categories">Categories</a></li>
+                    <li><a href="#cart">Cart</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-envelope"></i> info@nepaltopup.com</p>
+                <p><i class="fas fa-phone"></i> +977 1234567890</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Nepal Top-Up. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Scripts -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="app.js"></script>
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { collection, query, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                // Get completed orders count
+                const ordersQuery = query(collection(db, 'orders'), where('status', '==', 'completed'));
+                const ordersSnapshot = await getDocs(ordersQuery);
+                const completedOrders = ordersSnapshot.size;
+                document.getElementById('completed-orders').textContent = completedOrders;
+
+                // Get total products (games supported)
+                const productsQuery = query(collection(db, 'products'));
+                const productsSnapshot = await getDocs(productsQuery);
+                const totalProducts = productsSnapshot.size;
+                document.getElementById('games-supported').textContent = totalProducts;
+
+                // Get reviews statistics
+                const reviewsQuery = query(collection(db, 'reviews'));
+                const reviewsSnapshot = await getDocs(reviewsQuery);
+                
+                let totalRating = 0;
+                let totalReviews = 0;
+                let happyCustomers = 0;
+
+                reviewsSnapshot.forEach(doc => {
+                    const review = doc.data();
+                    totalRating += review.rating;
+                    totalReviews++;
+                    if (review.rating === 5) {
+                        happyCustomers++;
+                    }
+                });
+
+                const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : '0.0';
+                
+                document.getElementById('average-rating').textContent = `${averageRating}/5`;
+                document.getElementById('happy-customers').textContent = happyCustomers;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Initialize statistics when the page loads
+        document.addEventListener('DOMContentLoaded', loadStatistics);
+    </script>
 </body>
-</html>
+</html> 
