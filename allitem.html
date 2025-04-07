@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products - Nepal Top-Up</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .search-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 25px;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 5px;
+            font-size: 1rem;
+        }
+
+        .search-box i {
+            color: #666;
+            margin-right: 10px;
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            grid-column: 1 / -1;
+        }
+
+        .no-products i {
+            font-size: 3rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .no-products h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .no-products p {
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+                padding: 0 15px;
+            }
+
+            .filter-container {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .filter-select {
+                flex: 1;
+                min-width: 150px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-gamepad"></i> Nepal Top-Up
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="allitem.html" class="active">All Items</a>
+            <a href="index.html#categories-section">Categories</a>
+            <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+            <a href="profile.html" class="account-icon"><i class="fas fa-user"></i></a>
+        </div>
+    </nav>
+
+    <!-- Bottom Navigation Bar for Mobile -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="allitem.html" class="mobile-nav-item active">
+                <i class="fas fa-th-large"></i>
+                <span>All Items</span>
+            </a>
+            <a href="index.html#categories-section" class="mobile-nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+            </a>
+            <a href="cart.html" class="mobile-nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span id="mobile-cart-count">0</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Search products...">
+            <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+        <div class="filter-container">
+            
+           
+            <select class="filter-select" id="category-filter">
+                <option value="all">All Categories</option>
+                <option value="mobile-games">Mobile Games</option>
+                <option value="pc-games">PC Games</option>
+                <option value="console-games">Console Games</option>
+                <option value="gift-cards">Gift Cards</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="products-grid" id="products-grid">
+        <!-- Products will be loaded here -->
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-envelope"></i> info@nepaltopup.com</p>
+                <p><i class="fas fa-phone"></i> +977 1234567890</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Nepal Top-Up. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { collection, query, getDocs, where, orderBy } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        // DOM Elements
+        const productsGrid = document.getElementById('products-grid');
+        const searchInput = document.getElementById('search-input');
+        const searchSuggestions = document.getElementById('search-suggestions');
+        const categoryFilterSelect = document.getElementById('category-filter');
+
+        // State
+        let products = [];
+        let currentFilters = {
+            search: '',
+            category: 'all'
+        };
+
+        // Search functionality
+        let searchTimeout;
+
+        // Load products
+        async function loadProducts() {
+            try {
+                const productsRef = collection(db, 'products');
+                const snapshot = await getDocs(productsRef);
+                products = [];
+                
+                snapshot.forEach(doc => {
+                    const product = doc.data();
+                    product.id = doc.id;
+                    products.push(product);
+                });
+                
+                applyFilters();
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showNotification('Error loading products', 'error');
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            let filteredProducts = [...products];
+            
+            // Apply search filter
+            if (currentFilters.search) {
+                const searchTerm = currentFilters.search.toLowerCase();
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Apply category filter
+            if (currentFilters.category !== 'all') {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.category === currentFilters.category
+                );
+            }
+            
+            displayProducts(filteredProducts);
+        }
+
+        // Display products
+        function displayProducts(productsToDisplay) {
+            productsGrid.innerHTML = '';
+            
+            if (productsToDisplay.length === 0) {
+                productsGrid.innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-search"></i>
+                        <h3>No products found</h3>
+                        <p>Try adjusting your filters or search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            productsToDisplay.forEach(product => {
+                const productElement = createProductCard(product);
+                productsGrid.appendChild(productElement);
+            });
+        }
+
+        // Create product card
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <div class="product-price">Rs. ${product.price}</div>
+                    <button class="btn-primary" onclick="window.location.href='product.html?id=${product.id}'">View Details</button>
+                </div>
+            `;
+            return card;
+        }
+
+        // Show search suggestions
+        function showSearchSuggestions(searchTerm) {
+            const matchingProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                product.description.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (matchingProducts.length > 0) {
+                searchSuggestions.innerHTML = matchingProducts
+                    .slice(0, 5) // Show only first 5 results
+                    .map(product => `
+                        <div class="suggestion-item" onclick="window.location.href='product.html?id=${product.id}'">
+                            <img src="${product.image}" alt="${product.name}" class="suggestion-image">
+                            <div>
+                                <div class="suggestion-name">${product.name}</div>
+                                <div class="suggestion-price">Rs. ${product.price}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                searchSuggestions.classList.add('active');
+            } else {
+                searchSuggestions.classList.remove('active');
+            }
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            currentFilters.search = searchTerm;
+            
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            // Show suggestions if there's a search term
+            if (searchTerm.length > 0) {
+                searchTimeout = setTimeout(() => {
+                    showSearchSuggestions(searchTerm);
+                }, 300);
+            } else {
+                searchSuggestions.classList.remove('active');
+            }
+            
+            applyFilters();
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                searchSuggestions.classList.remove('active');
+            }
+        });
+
+        categoryFilterSelect.addEventListener('change', (e) => {
+            currentFilters.category = e.target.value;
+            applyFilters();
+        });
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadProducts);
+    </script>
+</body>
+</html> 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Nepal Top-Up</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
@@ -630,6 +631,84 @@
             margin-top: 20px;
         }
 
+        .admin-search {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background-color: var(--background-light);
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+
+        .admin-search input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            padding: 5px;
+            width: 200px;
+        }
+
+        .admin-search input:focus {
+            outline: none;
+        }
+
+        .admin-search button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .admin-search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--background-darker);
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .admin-search-suggestions.active {
+            display: block;
+        }
+
+        .admin-suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .admin-suggestion-item:hover {
+            background-color: var(--hover-color);
+        }
+
+        .admin-suggestion-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .admin-suggestion-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .admin-suggestion-price {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
         @media (max-width: 768px) {
             .admin-container {
                 flex-direction: column;
@@ -660,6 +739,46 @@
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-gamepad"></i> Nepal Top-Up
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#products">Games</a>
+            <a href="index.html#categories-section">Categories</a>
+            <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+            <a href="profile.html" class="account-icon"><i class="fas fa-user"></i></a>
+        </div>
+    </nav>
+
+    <!-- Bottom Navigation Bar for Mobile -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="index.html#products" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>Games</span>
+            </a>
+            <a href="index.html#categories-section" class="mobile-nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+            </a>
+            <a href="cart.html" class="mobile-nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span id="mobile-cart-count">0</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+        </div>
+    </div>
+
     <div class="admin-container">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -702,7 +821,7 @@
                             <h3>Total Revenue</h3>
                             <i class="fas fa-dollar-sign"></i>
                         </div>
-                        <p id="total-revenue">$0</p>
+                        <p id="total-revenue">Rs. 0</p>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-header">
@@ -939,6 +1058,14 @@
                         </form>
                     </div>
                 </div>
+            </div>
+
+            <div class="admin-search">
+                <input type="text" id="admin-search-input" placeholder="Search...">
+                <button id="admin-search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+                <div class="admin-search-suggestions" id="admin-search-suggestions"></div>
             </div>
         </main>
     </div>

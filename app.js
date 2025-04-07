@@ -373,66 +373,119 @@ function createProductCard(product) {
     return card;
 }
 
-// Update addToCart function to handle variants
-function addToCart(productId, name, price, quantity = 1, variants = null) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existingItem = cart.find(item => 
-        item.id === productId && 
-        JSON.stringify(item.variants) === JSON.stringify(variants)
-    );
-    
-    if (existingItem) {
-        existingItem.quantity += quantity;
-    } else {
-        cart.push({
-            id: productId,
-            name: name,
-            price: price,
-            quantity: quantity,
-            variants: variants
+// Function to get variant price from Firestore
+async function getVariantPrice(productId, variantDetails) {
+    try {
+        const productDoc = await getDoc(doc(db, 'products', productId));
+        if (!productDoc.exists()) {
+            throw new Error('Product not found');
+        }
+
+        const product = productDoc.data();
+        if (!product.variants || !Array.isArray(product.variants)) {
+            return product.price; // Return base price if no variants
+        }
+
+        // Find matching variant
+        const matchingVariant = product.variants.find(variant => {
+            return Object.entries(variantDetails).every(([key, value]) => 
+                variant[key] === value
+            );
         });
+
+        return matchingVariant ? matchingVariant.price : product.price;
+    } catch (error) {
+        console.error('Error getting variant price:', error);
+        throw error;
     }
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartUI();
-    updateCartCount();
 }
 
-// Update updateCartUI function to display variants
+// Update addToCart function to handle variants
+async function addToCart(productId, name, price, quantity = 1, variants = null) {
+    try {
+        let finalPrice = price;
+        
+        // If variants are provided, get the correct price from Firestore
+        if (variants) {
+            finalPrice = await getVariantPrice(productId, variants);
+        }
+
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        // Create a unique identifier for the item including variants
+        const itemKey = variants ? `${productId}-${JSON.stringify(variants)}` : productId;
+        
+        // Find existing item with same product ID and variants
+        const existingItem = cart.find(item => {
+            const itemKey = variants ? `${item.id}-${JSON.stringify(item.variants)}` : item.id;
+            return itemKey === itemKey;
+        });
+        
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({
+                id: productId,
+                name: name,
+                price: finalPrice,
+                quantity: quantity,
+                variants: variants
+            });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartUI();
+        updateCartCount();
+        showNotification('Item added to cart', 'success');
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        showNotification('Error adding item to cart', 'error');
+    }
+}
+
+// Update updateCartUI function to display variants and calculate subtotal with variant prices
 function updateCartUI() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    cartItems.innerHTML = '';
+    const cartItems = document.getElementById('cart-items');
+    if (!cartItems) return;
     
+    cartItems.innerHTML = '';
     let subtotal = 0;
     
     cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
+        // Calculate item total based on variant price if available
+        const itemPrice = item.variants && item.variants.price ? item.variants.price : item.price;
+        const itemTotal = itemPrice * item.quantity;
         subtotal += itemTotal;
         
         const cartItem = document.createElement('div');
         cartItem.className = 'cart-item';
         
+        // Create variant text excluding the price field
         let variantText = '';
         if (item.variants) {
-            variantText = `<div class="cart-item-variants">
-                ${Object.entries(item.variants).map(([name, value]) => 
-                    `<span>${name}: ${value}</span>`
-                ).join('')}
-            </div>`;
+            const variantDetails = Object.entries(item.variants)
+                .filter(([key]) => key !== 'price')
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ');
+            
+            if (variantDetails) {
+                variantText = `<div class="cart-item-variants">${variantDetails}</div>`;
+            }
         }
         
         cartItem.innerHTML = `
             <div class="cart-item-details">
                 <h4>${item.name}</h4>
                 ${variantText}
-                <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                <div class="cart-item-price">Rs. ${itemPrice.toFixed(2)}</div>
             </div>
             <div class="cart-item-quantity">
                 <button class="quantity-btn" onclick="updateCartItemQuantity('${item.id}', ${item.quantity - 1}, ${JSON.stringify(item.variants)})">-</button>
                 <span>${item.quantity}</span>
                 <button class="quantity-btn" onclick="updateCartItemQuantity('${item.id}', ${item.quantity + 1}, ${JSON.stringify(item.variants)})">+</button>
             </div>
-            <div class="cart-item-total">$${itemTotal.toFixed(2)}</div>
+            <div class="cart-item-total">Rs. ${itemTotal.toFixed(2)}</div>
             <button class="btn-remove" onclick="removeCartItem('${item.id}', ${JSON.stringify(item.variants)})">
                 <i class="fas fa-times"></i>
             </button>
@@ -441,17 +494,33 @@ function updateCartUI() {
         cartItems.appendChild(cartItem);
     });
     
-    cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
-    const shipping = subtotal > 0 ? 10 : 0;
-    shippingCost.textContent = `$${shipping.toFixed(2)}`;
-    cartTotal.textContent = `$${(subtotal + shipping).toFixed(2)}`;
+    // Update cart totals
+    const cartSubtotal = document.getElementById('cart-subtotal');
+    const shippingCost = document.getElementById('shipping-cost');
+    const cartTotal = document.getElementById('cart-total');
+    
+    if (cartSubtotal) cartSubtotal.textContent = `Rs. ${subtotal.toFixed(2)}`;
+    if (shippingCost) {
+        const shipping = subtotal > 0 ? 10 : 0;
+        shippingCost.textContent = `Rs. ${shipping.toFixed(2)}`;
+    }
+    if (cartTotal) {
+        const total = subtotal + (subtotal > 0 ? 10 : 0);
+        cartTotal.textContent = `Rs. ${total.toFixed(2)}`;
+    }
 }
 
-function updateCartItemQuantity(productId, newQuantity) {
+// Update updateCartItemQuantity function to handle variants
+function updateCartItemQuantity(productId, newQuantity, variants = null) {
     if (newQuantity < 1) return;
 
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const item = cart.find(item => item.id === productId);
+    const itemKey = variants ? `${productId}-${JSON.stringify(variants)}` : productId;
+    
+    const item = cart.find(item => {
+        const itemKey = variants ? `${item.id}-${JSON.stringify(item.variants)}` : item.id;
+        return itemKey === itemKey;
+    });
 
     if (item) {
         item.quantity = newQuantity;
@@ -475,9 +544,16 @@ function setCartItemQuantity(productId, newQuantity) {
     }
 }
 
-function removeCartItem(productId) {
+// Update removeCartItem function to handle variants
+function removeCartItem(productId, variants = null) {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const updatedCart = cart.filter(item => item.id !== productId);
+    const itemKey = variants ? `${productId}-${JSON.stringify(variants)}` : productId;
+    
+    const updatedCart = cart.filter(item => {
+        const itemKey = variants ? `${item.id}-${JSON.stringify(item.variants)}` : item.id;
+        return itemKey !== itemKey;
+    });
+    
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     updateCartUI();
     updateCartCount();

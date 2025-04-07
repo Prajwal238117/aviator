@@ -68,28 +68,35 @@
             border-radius: 10px;
             padding: 30px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
         }
 
         .review-header {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             margin-bottom: 20px;
         }
 
-        .reviewer-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 15px;
+        .reviewer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .reviewer-info h3 {
-            margin: 0;
+        .reviewer-name {
+            font-weight: 600;
             color: var(--dark-color);
         }
 
-        .reviewer-info p {
-            margin: 5px 0 0;
+        .reviewer-name .first-name {
+            margin-right: 5px;
+        }
+
+        .reviewer-info .date-time {
             color: var(--gray);
             font-size: 0.9rem;
         }
@@ -97,17 +104,18 @@
         .review-rating {
             color: #ffd700;
             margin-bottom: 15px;
+            font-size: 1.2rem;
         }
 
         .review-content {
             color: var(--dark-color);
             line-height: 1.6;
+            margin-bottom: 15px;
         }
 
         .review-date {
             color: var(--gray);
             font-size: 0.9rem;
-            margin-top: 15px;
         }
 
         .reviews-filter {
@@ -144,6 +152,13 @@
             border: 1px solid #ddd;
             border-radius: 20px;
             background-color: white;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+            font-size: 1.2rem;
         }
 
         @media (max-width: 992px) {
@@ -223,35 +238,50 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-brand">
-            <i class="fas fa-mobile-alt"></i> Nepal Top-Up
+            <i class="fas fa-gamepad"></i> Nepal Top-Up
         </div>
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="index.html#categories">Categories</a>
-            <a href="index.html#cart" class="cart-icon">
-                <i class="fas fa-shopping-cart"></i>
-                <span id="cart-count">0</span>
-            </a>
-            <a href="profile.html" class="account-icon">
-                <i class="fas fa-user"></i>
-            </a>
-        </div>
-        <div class="mobile-menu-btn">
-            <i class="fas fa-bars"></i>
+            <a href="index.html#products">Games</a>
+            <a href="index.html#categories-section">Categories</a>
+            <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+            <a href="profile.html" class="account-icon"><i class="fas fa-user"></i></a>
         </div>
     </nav>
 
-    <div class="mobile-menu">
-        <a href="index.html">Home</a>
-        <a href="index.html#categories">Categories</a>
-        <a href="index.html#cart">Cart</a>
-        <a href="profile.html">Account</a>
+    <!-- Bottom Navigation Bar for Mobile -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="index.html#products" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>Games</span>
+            </a>
+            <a href="index.html#categories-section" class="mobile-nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+            </a>
+            <a href="cart.html" class="mobile-nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span id="mobile-cart-count">0</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+        </div>
     </div>
 
-    <!-- Reviews Hero -->
+    <!-- Reviews Hero Section -->
     <section class="reviews-hero">
-        <h1>Customer Reviews</h1>
-        <p>See what our customers have to say about their experience with Nepal Top-Up</p>
+        <div class="container">
+            <h1>Customer Reviews</h1>
+            <p>See what our customers have to say about their experience with Nepal Top-Up</p>
+        </div>
     </section>
 
     <!-- Reviews Stats -->
@@ -266,8 +296,8 @@
                 <p>Total Reviews</p>
             </div>
             <div class="review-stat">
-                <h3 id="happy-customers">0</h3>
-                <p>Happy Customers</p>
+                <h3 id="positive-reviews">0%</h3>
+                <p>Positive Reviews</p>
             </div>
         </div>
     </section>
@@ -275,14 +305,14 @@
     <!-- Reviews Filter -->
     <div class="reviews-filter">
         <div class="filter-buttons">
-            <button class="filter-btn active">All Reviews</button>
-            <button class="filter-btn">5 Star</button>
-            <button class="filter-btn">4 Star</button>
-            <button class="filter-btn">3 Star</button>
-            <button class="filter-btn">2 Star</button>
-            <button class="filter-btn">1 Star</button>
+            <button class="filter-btn active" data-rating="all">All Reviews</button>
+            <button class="filter-btn" data-rating="5">5 Stars</button>
+            <button class="filter-btn" data-rating="4">4 Stars</button>
+            <button class="filter-btn" data-rating="3">3 Stars</button>
+            <button class="filter-btn" data-rating="2">2 Stars</button>
+            <button class="filter-btn" data-rating="1">1 Star</button>
         </div>
-        <select class="sort-select">
+        <select class="sort-select" id="sort-reviews">
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
             <option value="highest">Highest Rated</option>
@@ -292,124 +322,178 @@
 
     <!-- Reviews Grid -->
     <div class="reviews-grid" id="reviews-container">
-        <!-- Reviews will be dynamically loaded here -->
+        <!-- Reviews will be loaded here -->
     </div>
 
     <!-- Firebase Modules -->
     <script type="module">
-        // Import Firebase modules
         import { auth, db } from './firebase-config.js';
-        import { collection, query, orderBy, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+        import { 
+            collection, 
+            query, 
+            orderBy, 
+            getDocs,
+            where,
+            getDoc,
+            doc
+        } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
         // DOM Elements
         const reviewsContainer = document.getElementById('reviews-container');
+        const averageRating = document.getElementById('average-rating');
+        const totalReviews = document.getElementById('total-reviews');
+        const positiveReviews = document.getElementById('positive-reviews');
         const filterButtons = document.querySelectorAll('.filter-btn');
-        const sortSelect = document.querySelector('.sort-select');
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        const mobileMenu = document.querySelector('.mobile-menu');
-        const averageRatingElement = document.getElementById('average-rating');
-        const totalReviewsElement = document.getElementById('total-reviews');
-        const happyCustomersElement = document.getElementById('happy-customers');
+        const sortSelect = document.getElementById('sort-reviews');
 
-        // Load statistics
-        async function loadStatistics() {
+        let currentFilter = 'all';
+        let currentSort = 'newest';
+        let allReviews = [];
+
+        // Load reviews
+        async function loadReviews() {
             try {
                 const reviewsRef = collection(db, 'reviews');
-                const reviewsSnapshot = await getDocs(reviewsRef);
-                
-                let totalRating = 0;
-                let totalReviews = 0;
-                let happyCustomers = 0;
+                let q;
 
-                reviewsSnapshot.forEach(doc => {
+                // Apply filters and sorting
+                if (currentFilter === 'all') {
+                    q = query(reviewsRef, orderBy('timestamp', 'desc'));
+                } else {
+                    q = query(
+                        reviewsRef,
+                        where('rating', '==', parseInt(currentFilter)),
+                        orderBy('timestamp', 'desc')
+                    );
+                }
+
+                const querySnapshot = await getDocs(q);
+                allReviews = [];
+                let totalRating = 0;
+                let positiveCount = 0;
+
+                // Create a map to store user data
+                const userDataMap = new Map();
+
+                // First, collect all unique user IDs
+                const userIds = new Set();
+                querySnapshot.forEach((doc) => {
                     const review = doc.data();
-                    totalRating += review.rating;
-                    totalReviews++;
-                    if (review.rating === 5) {
-                        happyCustomers++;
+                    if (review.userId) {
+                        userIds.add(review.userId);
                     }
                 });
 
-                const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : '0.0';
-                
-                // Update the stats in the UI
-                averageRatingElement.textContent = averageRating;
-                totalReviewsElement.textContent = totalReviews;
-                happyCustomersElement.textContent = happyCustomers;
-            } catch (error) {
-                console.error('Error loading statistics:', error);
-                showNotification('Error loading statistics', 'error');
-            }
-        }
+                // Fetch all user data in one batch
+                const userPromises = Array.from(userIds).map(async (userId) => {
+                    try {
+                        const userDoc = await getDoc(doc(db, 'users', userId));
+                        if (userDoc.exists()) {
+                            userDataMap.set(userId, userDoc.data());
+                        }
+                    } catch (error) {
+                        console.error('Error fetching user data:', error);
+                    }
+                });
 
-        // Load reviews
-        async function loadReviews(filter = 'all', sort = 'newest') {
-            try {
-                const reviewsRef = collection(db, 'reviews');
-                let reviewsQuery = query(reviewsRef);
+                // Wait for all user data to be fetched
+                await Promise.all(userPromises);
 
-                // Apply filters
-                if (filter !== 'all') {
-                    const rating = parseInt(filter);
-                    reviewsQuery = query(reviewsRef, where('rating', '==', rating));
-                }
+                querySnapshot.forEach((doc) => {
+                    const review = doc.data();
+                    review.id = doc.id;
+                    
+                    // Add user data to the review if available
+                    if (review.userId && userDataMap.has(review.userId)) {
+                        const userData = userDataMap.get(review.userId);
+                        review.firstName = userData.firstName;
+                        review.lastName = userData.lastName;
+                    }
+                    
+                    allReviews.push(review);
+                    totalRating += review.rating;
+                    if (review.rating >= 4) positiveCount++;
+                });
 
                 // Apply sorting
-                switch (sort) {
-                    case 'oldest':
-                        reviewsQuery = query(reviewsQuery, orderBy('createdAt', 'asc'));
-                        break;
-                    case 'highest':
-                        reviewsQuery = query(reviewsQuery, orderBy('rating', 'desc'));
-                        break;
-                    case 'lowest':
-                        reviewsQuery = query(reviewsQuery, orderBy('rating', 'asc'));
-                        break;
-                    default:
-                        reviewsQuery = query(reviewsQuery, orderBy('createdAt', 'desc'));
+                sortReviews();
+
+                // Update stats
+                const reviewCount = allReviews.length;
+                totalReviews.textContent = reviewCount;
+                
+                if (reviewCount > 0) {
+                    const avgRating = (totalRating / reviewCount).toFixed(1);
+                    averageRating.textContent = avgRating;
+                    positiveReviews.textContent = `${Math.round((positiveCount / reviewCount) * 100)}%`;
                 }
 
-                const reviewsSnapshot = await getDocs(reviewsQuery);
-                reviewsContainer.innerHTML = '';
-
-                if (reviewsSnapshot.empty) {
-                    reviewsContainer.innerHTML = '<p class="no-reviews">No reviews found.</p>';
-                    return;
-                }
-
-                reviewsSnapshot.forEach(doc => {
-                    const review = doc.data();
-                    const reviewElement = createReviewElement(review);
-                    reviewsContainer.appendChild(reviewElement);
-                });
+                displayReviews();
             } catch (error) {
                 console.error('Error loading reviews:', error);
                 showNotification('Error loading reviews', 'error');
             }
         }
 
-        // Create review element
-        function createReviewElement(review) {
-            const div = document.createElement('div');
-            div.className = 'review-card animate__animated animate__fadeIn';
+        // Sort reviews
+        function sortReviews() {
+            switch (currentSort) {
+                case 'newest':
+                    allReviews.sort((a, b) => b.timestamp - a.timestamp);
+                    break;
+                case 'oldest':
+                    allReviews.sort((a, b) => a.timestamp - b.timestamp);
+                    break;
+                case 'highest':
+                    allReviews.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'lowest':
+                    allReviews.sort((a, b) => a.rating - b.rating);
+                    break;
+            }
+        }
 
-            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-            const date = new Date(review.createdAt.toDate()).toLocaleDateString();
+        // Display reviews
+        function displayReviews() {
+            reviewsContainer.innerHTML = '';
 
-            div.innerHTML = `
-                <div class="review-header">
-                    <img src="${review.userPhoto || 'https://via.placeholder.com/50'}" alt="${review.userName}" class="reviewer-avatar">
-                    <div class="reviewer-info">
-                        <h3>${review.userName}</h3>
-                        <p>Verified Purchase</p>
+            if (allReviews.length === 0) {
+                reviewsContainer.innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-comment-slash"></i>
+                        <p>No reviews found</p>
                     </div>
-                </div>
-                <div class="review-rating">${stars}</div>
-                <div class="review-content">${review.content}</div>
-                <div class="review-date">${date}</div>
-            `;
+                `;
+                return;
+            }
 
-            return div;
+            allReviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card';
+                
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                const date = new Date(review.timestamp).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                reviewCard.innerHTML = `
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">
+                                <span class="first-name">${review.firstName || 'Anonymous'}</span>
+                                <span class="last-name">${review.lastName || ''}</span>
+                            </div>
+                            <div class="date-time">${formatDateTime(review.timestamp)}</div>
+                        </div>
+                    </div>
+                    <div class="review-rating">${stars}</div>
+                    <div class="review-content">${review.comment}</div>
+                `;
+
+                reviewsContainer.appendChild(reviewCard);
+            });
         }
 
         // Event Listeners
@@ -417,39 +501,56 @@
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
-                const filter = button.textContent.toLowerCase().replace(' star', '');
-                loadReviews(filter, sortSelect.value);
+                currentFilter = button.dataset.rating;
+                loadReviews();
             });
         });
 
-        sortSelect.addEventListener('change', () => {
-            const activeFilter = document.querySelector('.filter-btn.active').textContent
-                .toLowerCase().replace(' star', '');
-            loadReviews(activeFilter, sortSelect.value);
+        sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            sortReviews();
+            displayReviews();
         });
 
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            mobileMenuBtn.classList.toggle('active');
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadStatistics();
-            loadReviews();
-        });
-
-        // Notification function
+        // Show notification
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.className = `notification notification-${type}`;
             notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
                 <span>${message}</span>
             `;
+
             document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
         }
+
+        // Format date and time
+        function formatDateTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            
+            const date = timestamp.toDate();
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Initialize
+        loadReviews();
     </script>
 </body>
 </html> 

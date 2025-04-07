@@ -389,28 +389,44 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-brand">
-            <i class="fas fa-mobile-alt"></i> Nepal Top-Up
+            <i class="fas fa-gamepad"></i> Nepal Top-Up
         </div>
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="index.html#products">Products</a>
-            <a href="index.html#cart" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
-            <a href="profile.html" class="active account-icon"><i class="fas fa-user"></i></a>
-        </div>
-        <div class="mobile-menu-btn">
-            <i class="fas fa-bars"></i>
+            <a href="index.html#products">Games</a>
+            <a href="index.html#categories-section">Categories</a>
+            <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
+            <a href="profile.html" class="account-icon"><i class="fas fa-user"></i></a>
         </div>
     </nav>
 
-    <div class="mobile-menu">
-        <a href="index.html">Home</a>
-        <a href="index.html#products">Products</a>
-        <a href="index.html#categories">Categories</a>
-        <a href="index.html#cart">Cart</a>
-        <a href="profile.html" class="active">Account</a>
+    <!-- Bottom Navigation Bar for Mobile -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="index.html#products" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>Games</span>
+            </a>
+            <a href="index.html#categories-section" class="mobile-nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+            </a>
+            <a href="cart.html" class="mobile-nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span id="mobile-cart-count">0</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item active">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+        </div>
     </div>
 
     <div class="profile-container">
@@ -581,8 +597,6 @@
         const addAddressBtn = document.getElementById('add-address');
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        const mobileMenu = document.querySelector('.mobile-menu');
 
         // Check authentication state
         onAuthStateChanged(auth, async (user) => {
@@ -879,12 +893,6 @@
                     }
                 });
             });
-        });
-
-        // Mobile menu toggle
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            mobileMenuBtn.classList.toggle('active');
         });
 
         // Format date

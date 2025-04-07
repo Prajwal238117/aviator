@@ -14,22 +14,39 @@
             <i class="fas fa-gamepad"></i> Nepal Top-Up
         </div>
         <div class="nav-links">
-            <a href="#" class="active">Home</a>
+            <a href="index.html" class="active">Home</a>
             <a href="#products">Games</a>
+            <a href="#categories-section">Categories</a>
             <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
             <a href="profile.html" class="account-icon"><i class="fas fa-user"></i></a>
         </div>
-        <div class="mobile-menu-btn">
-            <i class="fas fa-bars"></i>
-        </div>
     </nav>
 
-    <div class="mobile-menu">
-        <a href="#" class="active">Home</a>
-        <a href="#products">Games</a>
-        <a href="#categories">Categories</a>
-        <a href="cart.html">Cart</a>
-        <a href="profile.html">Account</a>
+    <!-- Bottom Navigation Bar for Mobile -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="index.html" class="mobile-nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="allitem.html" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>Products</span>
+            </a>
+            <a href="#categories-section" class="mobile-nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+            </a>
+            <a href="cart.html" class="mobile-nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span id="mobile-cart-count">0</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+        </div>
     </div>
 
     <header class="hero">
@@ -37,8 +54,8 @@
             <h1>Welcome to Nepal Top-Up</h1>
             <p>Your Ultimate Gaming Digital Store</p>
             <div class="hero-buttons">
-                <a href="#products" class="btn-primary">Shop Now</a>
-                <a href="#categories" class="btn-secondary">Browse Categories</a>
+                <a href="#products" class="btn-rgb">Shop Now</a>
+                <a href="#categories-section" class="btn-secondary">Browse Categories</a>
             </div>
         </div>
     </header>
@@ -97,17 +114,19 @@
                 <h2 class="section-title">Rate Your Experience</h2>
                 <p>Help us improve our services by sharing your feedback</p>
                 <div class="rating-stars">
-                    <i class="far fa-star" data-rating="1"></i>
-                    <i class="far fa-star" data-rating="2"></i>
-                    <i class="far fa-star" data-rating="3"></i>
-                    <i class="far fa-star" data-rating="4"></i>
-                    <i class="far fa-star" data-rating="5"></i>
+                    <i class="far fa-star" data-rating="1" data-value="1"></i>
+                    <i class="far fa-star" data-rating="2" data-value="2"></i>
+                    <i class="far fa-star" data-rating="3" data-value="3"></i>
+                    <i class="far fa-star" data-rating="4" data-value="4"></i>
+                    <i class="far fa-star" data-rating="5" data-value="5"></i>
                 </div>
                 <form id="review-form" class="review-form">
                     <textarea placeholder="Share your experience with us..." required></textarea>
-                    <button type="submit" class="btn-primary">Submit Review</button>
+                    <div class="review-actions">
+                        <button type="submit" class="btn-primary">Submit Review</button>
+                        <a href="reviews.html" class="btn-secondary">See All Reviews</a>
+                    </div>
                 </form>
-                <a href="reviews.html" class="btn-secondary">See All Reviews</a>
             </div>
         </section>
 
@@ -190,7 +209,7 @@
     <script type="module" src="app.js"></script>
     <script type="module">
         import { auth, db } from './firebase-config.js';
-        import { collection, query, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+        import { collection, query, getDocs, where, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
         // Load statistics
         async function loadStatistics() {
@@ -235,6 +254,314 @@
 
         // Initialize statistics when the page loads
         document.addEventListener('DOMContentLoaded', loadStatistics);
+        
+        // Update mobile cart count
+        function updateMobileCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('mobile-cart-count').textContent = count;
+        }
+        
+        // Initialize mobile menu
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    mobileMenuBtn.classList.toggle('active');
+                });
+            }
+            
+            // Update mobile cart count
+            updateMobileCartCount();
+        });
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Add show class after a small delay to trigger animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Rating Stars Functionality
+        const ratingStars = document.querySelectorAll('.rating-stars i');
+        const reviewForm = document.getElementById('review-form');
+        let selectedRating = 0;
+
+        // Function to update stars display
+        function updateStars(rating) {
+            ratingStars.forEach(star => {
+                const value = parseInt(star.dataset.value);
+                if (value <= rating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
+
+        // Add hover effect
+        ratingStars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = parseInt(star.dataset.value);
+                updateStars(rating);
+            });
+
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.value);
+                updateStars(selectedRating);
+            });
+        });
+
+        // Reset stars when mouse leaves the container
+        document.querySelector('.rating-stars').addEventListener('mouseleave', () => {
+            updateStars(selectedRating);
+        });
+
+        // Handle review submission
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedRating) {
+                showNotification('Please select a rating', 'error');
+                return;
+            }
+
+            try {
+                const review = {
+                    rating: selectedRating,
+                    comment: reviewForm.querySelector('textarea').value,
+                    timestamp: serverTimestamp(),
+                    userId: auth.currentUser ? auth.currentUser.uid : null
+                };
+
+                await addDoc(collection(db, 'reviews'), review);
+                showNotification('Review submitted successfully', 'success');
+                selectedRating = 0;
+                updateStars(0);
+                reviewForm.reset();
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                showNotification('Error submitting review', 'error');
+            }
+        });
     </script>
+
+    <style>
+        /* Add notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-success {
+            border-left: 4px solid #2ecc71;
+        }
+
+        .notification-error {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .notification-info {
+            border-left: 4px solid #3498db;
+        }
+
+        .notification i {
+            font-size: 1.2rem;
+        }
+
+        .notification-success i {
+            color: #2ecc71;
+        }
+
+        .notification-error i {
+            color: #e74c3c;
+        }
+
+        .notification-info i {
+            color: #3498db;
+        }
+
+        .rate-us-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 20px;
+            text-align: center;
+            color: white;
+            margin: 40px 0;
+        }
+
+        .rate-us-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .rate-us-content h2 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .rate-us-content p {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .rating-stars i {
+            font-size: 2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .rating-stars i:hover {
+            transform: scale(1.2);
+            color: #ffd700;
+        }
+
+        .rating-stars i.fas {
+            color: #ffd700;
+        }
+
+        .review-form {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .review-form textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            font-size: 1em;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .review-form textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            background: white;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .rate-us-content {
+                padding: 30px 20px;
+            }
+
+            .rate-us-content h2 {
+                font-size: 2em;
+            }
+
+            .rating-stars i {
+                font-size: 1.8em;
+            }
+
+            .review-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
 </body>
 </html> 

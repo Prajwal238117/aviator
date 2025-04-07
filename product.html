@@ -6,6 +6,7 @@
     <title>Product Details - Nepal Top-Up</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         .product-container {
             max-width: 1200px;
@@ -104,83 +105,66 @@
         }
 
         .custom-fields {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
             border-radius: 8px;
-            border: 1px solid #eee;
+            border: 1px solid #e9ecef;
+            display: block !important; /* Force display */
+            visibility: visible !important; /* Force visibility */
+            opacity: 1 !important; /* Force opacity */
+            position: relative !important; /* Ensure proper positioning */
+            z-index: 1 !important; /* Ensure proper stacking */
         }
 
         .custom-fields-title {
-            font-weight: 600;
-            color: var(--dark-color);
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #212529;
+            display: block !important; /* Force display */
         }
 
         .custom-field {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            padding: 10px;
-            background-color: white;
-            border-radius: 5px;
-            border: 1px solid #eee;
+            margin-bottom: 1rem;
+            display: block !important; /* Force display */
         }
 
         .custom-field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #495057;
             font-weight: 500;
-            color: var(--dark-color);
         }
 
-        .custom-field input[type="text"],
-        .custom-field input[type="number"],
-        .custom-field input[type="email"],
-        .custom-field input[type="tel"],
-        .custom-field input[type="date"],
-        .custom-field textarea,
-        .custom-field select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
+        .custom-field-input,
+        .custom-field-textarea,
+        .custom-field-select {
             width: 100%;
-        }
-
-        .custom-field textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        .custom-field input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-
-        .custom-field input[type="radio"] {
-            margin-right: 10px;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+            color: #212529;
+            background-color: #fff;
+            display: block !important; /* Force display */
         }
 
         .custom-field-radio-group,
         .custom-field-checkbox-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            display: block !important; /* Force display */
         }
 
-        .custom-field-radio-option,
-        .custom-field-checkbox-option {
+        .custom-field-radio,
+        .custom-field-checkbox {
             display: flex;
             align-items: center;
-        }
-
-        .custom-field-radio-option label,
-        .custom-field-checkbox-option label {
-            margin-bottom: 0;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: block !important; /* Force display */
         }
 
         .add-to-cart-btn {
@@ -218,19 +202,37 @@
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="index.html#products">Games</a>
+            <a href="index.html#categories-section">Categories</a>
             <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span></a>
             <a href="profile.html" class="account-icon"><i class="fas fa-user"></i></a>
         </div>
-        <div class="mobile-menu-btn">
-            <i class="fas fa-bars"></i>
-        </div>
     </nav>
 
-    <div class="mobile-menu">
-        <a href="index.html">Home</a>
-        <a href="index.html#products">Games</a>
-        <a href="index.html#cart">Cart</a>
-        <a href="profile.html">Account</a>
+    <!-- Bottom Navigation Bar for Mobile -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="index.html#products" class="mobile-nav-item">
+                <i class="fas fa-gamepad"></i>
+                <span>Games</span>
+            </a>
+            <a href="index.html#categories-section" class="mobile-nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Categories</span>
+            </a>
+            <a href="cart.html" class="mobile-nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Cart</span>
+                <span id="mobile-cart-count">0</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Account</span>
+            </a>
+        </div>
     </div>
 
     <div class="product-container">
@@ -247,110 +249,142 @@
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
 
-        // Make addToCart function globally accessible
-        window.addToCart = function(productId) {
-            // Get product data from Firestore
-            const productRef = doc(db, 'products', productId);
-            getDoc(productRef).then((doc) => {
-                if (doc.exists()) {
-                    const product = doc.data();
-                    product.id = doc.id;
-                    
-                    // Get selected variant if any
-                    let selectedVariant = null;
-                    const variantRadio = document.querySelector('input[name="variant"]:checked');
-                    if (variantRadio) {
-                        const variantName = variantRadio.value;
-                        selectedVariant = product.variants.find(v => v.name === variantName);
-                    }
-                    
-                    // Get custom field values
-                    const customFieldValues = {};
-                    if (product.customFields && product.customFields.length > 0) {
-                        product.customFields.forEach((field, index) => {
-                            const fieldId = `custom-field-${index}`;
-                            
+        // Add to cart function
+        window.addToCart = async function(productId) {
+            try {
+                // Debug: Log the product ID
+                console.log('Adding product to cart:', productId);
+                
+                // Get the product data from Firestore
+                const productDoc = await getDoc(doc(db, 'products', productId));
+                
+                if (!productDoc.exists()) {
+                    console.error('Product not found');
+                    showNotification('Error: Product not found', 'error');
+                    return;
+                }
+                
+                const product = productDoc.data();
+                console.log('Product data:', product);
+                
+                // Get selected variants
+                const selectedVariants = {};
+                let variantPrice = 0;
+                if (product.variants) {
+                    product.variants.forEach(variant => {
+                        const select = document.getElementById(`variant-${variant.name}`);
+                        if (select) {
+                            const selectedOption = select.options[select.selectedIndex];
+                            selectedVariants[variant.name] = {
+                                value: select.value,
+                                price: parseFloat(selectedOption.dataset.price || 0)
+                            };
+                            variantPrice += selectedVariants[variant.name].price;
+                            console.log(`Selected variant ${variant.name}:`, selectedVariants[variant.name]);
+                        }
+                    });
+                }
+                
+                // Get custom field values
+                const customFieldValues = {};
+                if (product.customFields) {
+                    product.customFields.forEach(field => {
+                        const fieldId = `custom-${field.type}-${field.label.toLowerCase().replace(/\s+/g, '-')}`;
+                        const fieldElement = document.getElementById(fieldId);
+                        
+                        if (fieldElement) {
                             switch (field.type) {
                                 case 'text':
-                                case 'number':
                                 case 'email':
                                 case 'tel':
+                                case 'number':
                                 case 'date':
                                 case 'textarea':
+                                    customFieldValues[field.label] = fieldElement.value;
+                                    break;
+                                    
                                 case 'select':
-                                    const input = document.getElementById(fieldId);
-                                    if (input) {
-                                        customFieldValues[field.label] = input.value;
-                                    }
+                                    customFieldValues[field.label] = fieldElement.value;
                                     break;
                                     
                                 case 'radio':
-                                    const radioInput = document.querySelector(`input[name="${fieldId}"]:checked`);
-                                    if (radioInput) {
-                                        customFieldValues[field.label] = radioInput.value;
+                                    const selectedRadio = document.querySelector(`input[name="${fieldId}"]:checked`);
+                                    if (selectedRadio) {
+                                        customFieldValues[field.label] = selectedRadio.value;
                                     }
                                     break;
                                     
                                 case 'checkbox':
-                                    const checkbox = document.getElementById(fieldId);
-                                    if (checkbox) {
-                                        customFieldValues[field.label] = checkbox.checked;
-                                    }
+                                    customFieldValues[field.label] = fieldElement.checked;
                                     break;
                                     
                                 case 'checkbox-group':
-                                    const checkedOptions = [];
-                                    const checkboxes = document.querySelectorAll(`input[name="${fieldId}"]:checked`);
-                                    checkboxes.forEach(checkbox => {
-                                        checkedOptions.push(checkbox.value);
-                                    });
-                                    customFieldValues[field.label] = checkedOptions;
+                                    const selectedCheckboxes = document.querySelectorAll(`input[name="${fieldId}"]:checked`);
+                                    customFieldValues[field.label] = Array.from(selectedCheckboxes).map(cb => cb.value);
                                     break;
                             }
-                        });
-                    }
-                    
-                    // Create cart item
-                    const cartItem = {
-                        id: product.id,
-                        name: product.name,
-                        price: selectedVariant ? selectedVariant.price : product.price,
-                        image: product.image,
-                        quantity: 1,
-                        customFields: customFieldValues
-                    };
-                    
-                    // Add to cart in localStorage
-                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                    const existingItemIndex = cart.findIndex(item => item.id === cartItem.id);
-                    
-                    if (existingItemIndex !== -1) {
-                        cart[existingItemIndex].quantity += 1;
-                    } else {
-                        cart.push(cartItem);
-                    }
-                    
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    
-                    // Update cart count
-                    const cartCount = document.getElementById('cart-count');
-                    if (cartCount) {
-                        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
-                    }
-                    
-                    // Show success notification
-                    showNotification('Product added to cart!', 'success');
-                } else {
-                    showNotification('Product not found!', 'error');
+                        }
+                    });
                 }
-            }).catch((error) => {
-                console.error("Error adding to cart:", error);
-                showNotification('Error adding product to cart!', 'error');
-            });
-        };
+                
+                // Get quantity
+                const quantityInput = document.getElementById('quantity');
+                const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+                
+                // Calculate total price
+                const basePrice = product.price || 0;
+                const totalPrice = basePrice + variantPrice;
+                
+                // Create cart item
+                const cartItem = {
+                    id: productId,
+                    name: product.name,
+                    price: totalPrice,
+                    image: product.image || product.images?.[0],
+                    quantity: quantity,
+                    variants: selectedVariants,
+                    customFields: customFieldValues
+                };
+                
+                console.log('Cart item:', cartItem);
+                
+                // Add to cart
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                
+                // Check if item with same variants and custom fields already exists
+                const existingItemIndex = cart.findIndex(item => {
+                    return item.id === productId && 
+                           JSON.stringify(item.variants) === JSON.stringify(selectedVariants) &&
+                           JSON.stringify(item.customFields) === JSON.stringify(customFieldValues);
+                });
+                
+                if (existingItemIndex !== -1) {
+                    cart[existingItemIndex].quantity += quantity;
+                } else {
+                    cart.push(cartItem);
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                // Update cart count
+                updateCartCount();
+                
+                // Show success notification with details
+                const variantInfo = Object.entries(selectedVariants)
+                    .map(([name, data]) => `${name}: ${data.value}`)
+                    .join(', ');
+                    
+                const successMessage = `Added to cart: ${product.name}${variantInfo ? ` (${variantInfo})` : ''} x ${quantity}`;
+                showNotification(successMessage, 'success');
+                
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showNotification('Error adding to cart', 'error');
+            }
+        }
 
         // Load product details
-        async function loadProductDetails() {
+        async function loadProductDetails(productId) {
             try {
                 const productDoc = await getDoc(doc(db, 'products', productId));
                 if (productDoc.exists()) {
@@ -368,6 +402,10 @@
         // Display product details
         function displayProductDetails(product) {
             const productDetailsContainer = document.getElementById('product-details');
+            
+            // Debug: Log product data
+            console.log('Product data:', product);
+            console.log('Custom fields:', product.customFields);
             
             // Create product details HTML
             let productHTML = `
@@ -405,16 +443,25 @@
             
             // Add custom fields if they exist
             if (product.customFields && product.customFields.length > 0) {
+                console.log('Adding custom fields to HTML');
                 productHTML += `
                     <div class="custom-fields">
                         <h3 class="custom-fields-title">Additional Information</h3>
                 `;
                 
                 product.customFields.forEach((field, index) => {
+                    console.log('Processing field:', field);
                     const fieldId = `custom-field-${index}`;
+                    
+                    // Ensure field has a type
+                    if (!field.type) {
+                        console.error('Field missing type:', field);
+                        field.type = 'text'; // Default to text if type is missing
+                    }
                     
                     switch (field.type) {
                         case 'text':
+                            console.log('Processing text field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label for="${fieldId}">${field.label}</label>
@@ -424,6 +471,7 @@
                             break;
                             
                         case 'number':
+                            console.log('Processing number field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label for="${fieldId}">${field.label}</label>
@@ -433,6 +481,7 @@
                             break;
                             
                         case 'email':
+                            console.log('Processing email field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label for="${fieldId}">${field.label}</label>
@@ -442,6 +491,7 @@
                             break;
                             
                         case 'tel':
+                            console.log('Processing tel field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label for="${fieldId}">${field.label}</label>
@@ -451,6 +501,7 @@
                             break;
                             
                         case 'date':
+                            console.log('Processing date field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label for="${fieldId}">${field.label}</label>
@@ -460,6 +511,7 @@
                             break;
                             
                         case 'textarea':
+                            console.log('Processing textarea field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label for="${fieldId}">${field.label}</label>
@@ -469,6 +521,7 @@
                             break;
                             
                         case 'select':
+                            console.log('Processing select field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label for="${fieldId}">${field.label}</label>
@@ -489,6 +542,7 @@
                             break;
                             
                         case 'radio':
+                            console.log('Processing radio field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label>${field.label}</label>
@@ -513,6 +567,7 @@
                             break;
                             
                         case 'checkbox':
+                            console.log('Processing checkbox field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <div class="custom-field-checkbox-option">
@@ -524,6 +579,7 @@
                             break;
                             
                         case 'checkbox-group':
+                            console.log('Processing checkbox-group field:', field.label);
                             productHTML += `
                                 <div class="custom-field">
                                     <label>${field.label}</label>
@@ -546,6 +602,10 @@
                                 </div>
                             `;
                             break;
+                            
+                        default:
+                            console.log('Unknown field type:', field.type);
+                            break;
                     }
                 });
                 
@@ -562,6 +622,74 @@
             
             // Set the product details HTML
             productDetailsContainer.innerHTML = productHTML;
+            
+            // Debug: Log the final HTML
+            console.log('Final product HTML:', productHTML);
+            
+            // Debug: Check if custom fields are in the DOM
+            const customFieldsContainer = document.querySelector('.custom-fields');
+            console.log('Custom fields container in DOM:', customFieldsContainer);
+            if (customFieldsContainer) {
+                console.log('Custom fields HTML:', customFieldsContainer.innerHTML);
+            } else {
+                console.error('Custom fields container not found in DOM');
+                
+                // Try to add custom fields manually if they're not in the DOM
+                if (product.customFields && product.customFields.length > 0) {
+                    console.log('Attempting to add custom fields manually');
+                    const productInfo = document.querySelector('.product-info');
+                    if (productInfo) {
+                        let customFieldsHTML = `
+                            <div class="custom-fields">
+                                <h3 class="custom-fields-title">Additional Information</h3>
+                        `;
+                        
+                        product.customFields.forEach((field, index) => {
+                            const fieldId = `custom-field-${index}`;
+                            
+                            // Ensure field has a type
+                            if (!field.type) {
+                                field.type = 'text'; // Default to text if type is missing
+                            }
+                            
+                            switch (field.type) {
+                                case 'text':
+                                    customFieldsHTML += `
+                                        <div class="custom-field">
+                                            <label for="${fieldId}">${field.label}</label>
+                                            <input type="text" id="${fieldId}" class="custom-field-input" ${field.required ? 'required' : ''}>
+                                        </div>
+                                    `;
+                                    break;
+                                    
+                                // Add other field types as needed
+                                default:
+                                    customFieldsHTML += `
+                                        <div class="custom-field">
+                                            <label for="${fieldId}">${field.label}</label>
+                                            <input type="text" id="${fieldId}" class="custom-field-input" ${field.required ? 'required' : ''}>
+                                        </div>
+                                    `;
+                                    break;
+                            }
+                        });
+                        
+                        customFieldsHTML += `
+                            </div>
+                        `;
+                        
+                        // Insert custom fields before the add to cart button
+                        const addToCartBtn = document.querySelector('.add-to-cart-btn');
+                        if (addToCartBtn) {
+                            addToCartBtn.insertAdjacentHTML('beforebegin', customFieldsHTML);
+                            console.log('Custom fields added manually');
+                        } else {
+                            productInfo.insertAdjacentHTML('beforeend', customFieldsHTML);
+                            console.log('Custom fields added to product info');
+                        }
+                    }
+                }
+            }
         }
 
         // Show notification
@@ -576,13 +704,22 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
+        // Update cart count - make it globally accessible
+        window.updateCartCount = function() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             if (productId) {
-                loadProductDetails();
+                loadProductDetails(productId);
             } else {
-                showNotification('No product ID provided', 'error');
+                showNotification('Product ID not found', 'error');
             }
+            // Update cart count on page load
+            updateCartCount();
         });
     </script>
 </body>
