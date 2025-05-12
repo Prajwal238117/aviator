@@ -1,136 +1,116 @@
-let multiplier = 1.0;
-let gameRunning = false;
-let cashoutMultiplier = null;
-let interval;
-let balance = 10000;
-let winnings = 0;
-let betAmount = 0; // Store the bet amount
+document.addEventListener('DOMContentLoaded', () => {
+    const calculateButton = document.getElementById('calculate');
+    const totalAmountInput = document.getElementById('total-amount');
+    const oddsCountSelect = document.getElementById('odds-count');
+    const oddsContainer = document.getElementById('odds-container');
+    const resultsContainer = document.getElementById('results-container');
+    const toastContainer = document.getElementById('toast-container');
 
-const multiplierDisplay = document.getElementById("multiplier");
-const balanceDisplay = document.getElementById("balance");
-const winningsDisplay = document.getElementById("winnings");
-const placeBetButton = document.getElementById("place-bet-button");
-const cashoutButton = document.getElementById("cashout-button");
-const aviatorImage = document.getElementById("aviator-image");
-const cashoutNotification = document.getElementById("cashout-notification");
-const betAmountInput = document.getElementById("bet-amount"); // Access the bet amount input field
-const betHistoryList = document.getElementById("bet-history-list"); // Bet history list element
+    // Initialize with 3 odds
+    updateOddsInputs(3);
 
-// Show a notification at the center of the screen that moves upwards
-function showCashOutNotification(message) {
-  const notification = document.getElementById("cashout-notification");
-  notification.textContent = message;
-  notification.classList.add("show"); // Add the "show" class for animation
+    oddsCountSelect.addEventListener('change', (e) => {
+        const count = parseInt(e.target.value);
+        updateOddsInputs(count);
+    });
 
-  // Hide the notification after 3 seconds (to allow for the slower animation)
-  setTimeout(() => {
-    notification.classList.remove("show");
-  }, 3000); // 3 seconds
-}
+    calculateButton.addEventListener('click', calculateBets);
 
-function triggerCrashAnimation() {
-  // Add 'crash' class to trigger the crash animation
-  aviatorImage.classList.add("crash");
+    function showToast(message, type = 'error') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <i class="toast-icon fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+            <span>${message}</span>
+        `;
+        toastContainer.appendChild(toast);
 
-  // Reset the animation after it finishes (1 second)
-  setTimeout(() => {
-    aviatorImage.classList.remove("crash");
-    aviatorImage.style.transform = "translateY(0)";
-  }, 1000);
-}
+        // Trigger animation
+        setTimeout(() => toast.classList.add('show'), 100);
 
-function endGame(won) {
-  gameRunning = false;
-  clearInterval(interval);
-
-  if (!won) {
-    // On crash, deduct the full bet amount from balance (without multiplying by the multiplier)
-    const lostAmount = betAmount;
-    triggerCrashAnimation(); // Trigger crash animation
-    showCashOutNotification(`You lost! Bet: $${betAmount.toFixed(2)} | Lost: $${lostAmount.toFixed(2)}`);
-  } else {
-    // On cash out, calculate the winnings based on the bet amount and multiplier
-    winnings = betAmount * cashoutMultiplier; // Calculate the winnings (Bet * Multiplier)
-    balance += winnings;
-    showCashOutNotification(`You cashed out at ${cashoutMultiplier.toFixed(2)}x!`);
-  }
-
-  // Update the UI with new balance and winnings
-  balanceDisplay.textContent = balance.toFixed(2);
-  winningsDisplay.textContent = winnings.toFixed(2);
-  multiplierDisplay.textContent = "1.00x";
-
-  // Disable the cashout button
-  cashoutButton.disabled = true;
-
-  // Update the bet history
-  addBetToHistory(betAmount, cashoutMultiplier, winnings, won);
-}
-
-function placeBet() {
-  betAmount = parseFloat(betAmountInput.value); // Get the bet amount entered by the user
-  if (isNaN(betAmount) || betAmount <= 0) {
-    showCashOutNotification("Please enter a valid bet amount!");
-    return;
-  }
-
-  if (betAmount > balance) {
-    showCashOutNotification("You do not have enough balance to place this bet.");
-    return;
-  }
-
-  balance -= betAmount; // Deduct the bet amount from balance
-  multiplier = 1.0;
-  cashoutMultiplier = null;
-
-  // Enable the cashout button
-  cashoutButton.disabled = false;
-
-  // Start the game logic when the player places a bet
-  gameRunning = true;
-  interval = setInterval(() => {
-    multiplier += 0.01;
-    multiplierDisplay.textContent = multiplier.toFixed(2) + "x";
-
-    // Randomly end the game with a crash
-    if (Math.random() < 0.01) {
-      endGame(false);
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
-  }, 100);
-}
 
-function cashOut() {
-  if (!gameRunning || cashoutMultiplier !== null) return;
+    function updateOddsInputs(count) {
+        // Clear existing odds inputs
+        oddsContainer.innerHTML = '';
+        resultsContainer.innerHTML = '';
 
-  cashoutMultiplier = multiplier;
-  endGame(true);
-}
+        // Create new odds inputs
+        for (let i = 1; i <= count; i++) {
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            inputGroup.innerHTML = `
+                <label for="odd${i}">Odd ${i}:</label>
+                <input type="number" id="odd${i}" placeholder="Enter odd" step="0.01" min="1">
+            `;
+            oddsContainer.appendChild(inputGroup);
 
-function addBetToHistory(betAmount, multiplier, winnings, won) {
-  const historyItem = document.createElement("li");
+            // Create result item
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            resultItem.innerHTML = `
+                <span>Bet ${i} Amount:</span>
+                <span id="bet${i}-amount">-</span>
+            `;
+            resultsContainer.appendChild(resultItem);
+        }
+    }
 
-  // Display loss or win in history
-  if (!won) {
-    historyItem.innerHTML = `
-      <span>Bet: $${betAmount.toFixed(2)} x${multiplier.toFixed(2)}</span>
-      <span>Winnings: -$${betAmount.toFixed(2)} (Lost)</span>
-    `;
-  } else {
-    historyItem.innerHTML = `
-      <span>Bet: $${betAmount.toFixed(2)} x${multiplier.toFixed(2)}</span>
-      <span>Winnings: $${winnings.toFixed(2)} (Won)</span>
-    `;
-  }
+    function calculateBets() {
+        const count = parseInt(oddsCountSelect.value);
+        const totalAmount = parseFloat(totalAmountInput.value);
+        const odds = [];
+        const bets = [];
+        const probabilities = [];
 
-  // Add the item to the bet history list
-  betHistoryList.appendChild(historyItem);
+        // Get all odds values
+        for (let i = 1; i <= count; i++) {
+            const odd = parseFloat(document.getElementById(`odd${i}`).value);
+            if (isNaN(odd) || odd <= 1) {
+                showToast('Please enter valid odds (greater than 1) for all fields');
+                return;
+            }
+            odds.push(odd);
+            probabilities.push(1 / odd);
+        }
 
-  // Optionally limit history to the last 5 items
-  if (betHistoryList.children.length > 5) {
-    betHistoryList.removeChild(betHistoryList.children[0]);
-  }
-}
+        // Validate total amount
+        if (isNaN(totalAmount) || totalAmount <= 0) {
+            showToast('Please enter a valid total amount (greater than 0)');
+            return;
+        }
 
-// Event Listeners
-placeBetButton.addEventListener("click", placeBet);
-cashoutButton.addEventListener("click", cashOut);
+        // Check if arbitrage is possible
+        const totalProbability = probabilities.reduce((sum, prob) => sum + prob, 0);
+        
+        if (totalProbability >= 1) {
+            showToast('No guaranteed profit possible with these odds');
+            return;
+        }
+
+        // Calculate bet amounts
+        for (let i = 0; i < count; i++) {
+            const bet = (totalAmount * probabilities[i]) / totalProbability;
+            bets.push(bet);
+        }
+
+        // Calculate potential returns
+        const returns = bets.map((bet, i) => bet * odds[i]);
+        const guaranteedProfit = returns[0] - totalAmount;
+
+        // Update results
+        for (let i = 0; i < count; i++) {
+            document.getElementById(`bet${i + 1}-amount`).textContent = `₹${bets[i].toFixed(2)}`;
+        }
+        document.getElementById('total-investment').textContent = `₹${totalAmount.toFixed(2)}`;
+        document.getElementById('guaranteed-profit').textContent = `₹${guaranteedProfit.toFixed(2)}`;
+
+        // Show success toast
+        showToast('Calculation completed successfully!', 'success');
+    }
+}); 
